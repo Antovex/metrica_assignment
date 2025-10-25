@@ -31,8 +31,7 @@ sudo apt install tmux -y
 tmux new -s metrica_backend
 #Then use paste this
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
-# Press Ctrl+B, then D to detach
-# To reattach: tmux attach -t metrica_backend
+# tmux kill-session -t metrica_backend
 ```
 Notes:
 - PDF generation uses **ReportLab**
