@@ -51,12 +51,3 @@ On first run, the backend auto-creates `backend/templates/template.docx` with th
 - Remarks / Notes: `{{Remarks}}`
 
 You can replace this file with the official provided template (keep the placeholders).
-
-## Recording
-Once both servers are running:
-1) Fill the form and submit.
-2) Click the returned PDF (or DOCX) link to view/download.
-3) See submissions listed below the form.
-
-## AI usage note
-This project was scaffolded and wired end‑to‑end with an AI assistant for speed. It generated boilerplate, API endpoints, and the template creation logic, while I verified behavior and added UI polish.
