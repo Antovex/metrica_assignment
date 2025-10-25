@@ -58,13 +58,14 @@ class Storage:
             json.dump(arr, f, default=str, indent=2)
         return new_id
 
-    async def update_urls(self, _id: str, pdf_url: Optional[str], docx_url: Optional[str]) -> None:
+    async def update_urls(self, _id: str, has_pdf: bool = False, has_docx: bool = False) -> None:
+        """Store only boolean flags, not full URLs (for portability across environments)"""
         if self._collection is not None:
             try:
                 # Convert string ID to ObjectId for MongoDB query
                 await self._collection.update_one(
                     {"_id": ObjectId(_id)}, 
-                    {"$set": {"pdfUrl": pdf_url, "docxUrl": docx_url}}
+                    {"$set": {"hasPdf": has_pdf, "hasDocx": has_docx}}
                 )
                 return
             except (PyMongoError, Exception):
@@ -75,8 +76,8 @@ class Storage:
                 arr: List[Dict[str, Any]] = json.load(f)
             for item in arr:
                 if str(item.get("_id")) == str(_id):
-                    item["pdfUrl"] = pdf_url
-                    item["docxUrl"] = docx_url
+                    item["hasPdf"] = has_pdf
+                    item["hasDocx"] = has_docx
                     break
             with open(self._json_path, "w", encoding="utf-8") as f:
                 json.dump(arr, f, default=str, indent=2)

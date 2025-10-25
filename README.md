@@ -17,8 +17,25 @@ React (Vite) frontend + FastAPI backend. Submits a form, stores data in MongoDB,
 python -m venv .venv; .\.venv\Scripts\Activate.ps1; pip install -r backend\requirements.txt; uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r backend/requirements.txt
+cd ..
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+```
+
+```bash
+#Run in Background
+sudo apt install tmux -y
+tmux new -s metrica_backend
+#Then use paste this
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+# Press Ctrl+B, then D to detach
+# To reattach: tmux attach -t metrica_backend
+```
 Notes:
-- PDF generation uses **ReportLab** (pure Python) - no Word or LibreOffice needed!
+- PDF generation uses **ReportLab**
 - Works on any platform (Windows, Linux, macOS)
 - Perfect for cloud deployment (Render, Railway, Fly.io, etc.)
 

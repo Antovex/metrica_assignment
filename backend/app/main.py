@@ -65,12 +65,14 @@ async def create_submission(payload: SubmissionIn):
     # Convert to PDF using pure Python (no Word/LibreOffice needed)
     ok, err = try_convert_to_pdf(docx_path, pdf_path, context)
 
-    # Build absolute URLs for download (use PUBLIC_BASE_URL or default to localhost)
+    # Store ONLY the file ID in database (not full URLs)
+    # URLs will be built dynamically at request time
+    await storage.update_urls(_id, has_pdf=ok, has_docx=True)
+
+    # Build absolute URLs for THIS response
     base = settings.PUBLIC_BASE_URL.rstrip("/") if settings.PUBLIC_BASE_URL else f"http://{settings.HOST}:{settings.PORT}"
     docx_url = f"{base}/api/download/{_id}/docx"
     pdf_url = f"{base}/api/download/{_id}/pdf" if ok else None
-
-    await storage.update_urls(_id, pdf_url, docx_url)
 
     resp = {
         "id": _id,
@@ -88,7 +90,19 @@ async def create_submission(payload: SubmissionIn):
 @app.get("/api/submissions")
 async def list_submissions():
     items = await storage.list_submissions()
-    # URLs are already absolute from creation time, just return them
+    
+    # Build URLs dynamically based on current environment
+    base = settings.PUBLIC_BASE_URL.rstrip("/") if settings.PUBLIC_BASE_URL else f"http://{settings.HOST}:{settings.PORT}"
+    
+    for item in items:
+        submission_id = item.get("id")
+        # Build URLs only if files exist (based on stored flags)
+        item["pdfUrl"] = f"{base}/api/download/{submission_id}/pdf" if item.get("hasPdf") else None
+        item["docxUrl"] = f"{base}/api/download/{submission_id}/docx" if item.get("hasDocx") else None
+        # Clean up internal flags from response
+        item.pop("hasPdf", None)
+        item.pop("hasDocx", None)
+    
     return {"items": items}
 
 
